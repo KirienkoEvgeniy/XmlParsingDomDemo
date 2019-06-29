@@ -1,5 +1,6 @@
 package org.demo;
 
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,7 +26,9 @@ public class EventHandler {
         Document document = docBuilder.parse(Event.class.getClassLoader().getResourceAsStream("org/demo/test.xml"));
         document.getDocumentElement().normalize();
         NodeList eventElements = document.getElementsByTagName("event");
+
         ArrayList<Event> eventList = new ArrayList<>();
+
         for (int i = 0; i < eventElements.getLength(); i++) {
             eventList.add(getEvent(eventElements.item(i)));
 
@@ -40,20 +43,24 @@ public class EventHandler {
             Element elementEvent = (Element) node;
             emp.setEvent_id(getTagValue("event_id", elementEvent));
             emp.setEvent_date(getTagValue("event_date", elementEvent));
-            Element event_parameters = (Element) elementEvent.getElementsByTagName("event_parameters").item(0);
-            String priority = getTagValue("priority", event_parameters);
-            String log_level = getTagValue("log_level", event_parameters);
-            String source = getTagValue("source", event_parameters);
-            emp.getEventParameter().add(new EventParameter(Integer.parseInt(priority), log_level, source));
+            NodeList event_parameters = elementEvent.getElementsByTagName("event_parameters");
+            for (int i = 0; i< event_parameters.getLength(); i++) {
+                Element element = (Element) event_parameters.item(i);
+                String priority = getTagValue("priority", element);
+                String log_level = getTagValue("log_level", element);
+                String source = getTagValue("source", element);
+                emp.getEventParameter().add(new EventParameter(Integer.parseInt(priority), log_level, source));
+            }
         }
         return emp;
     }
 
     private static String getTagValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
-        Node node = (Node) nodeList.item(0);
-        return node.getNodeValue();
+            Node node = (Node) nodeList.item(0);
+            return node.getNodeValue();
     }
+
     public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
 
         EventHandler eventHandler = new EventHandler();
